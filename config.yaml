@@ -1,0 +1,109 @@
+evento:
+  nombre: "Romería 2026"
+
+calendario:
+  Viernes:
+    "Mediodía": "eleccion"
+    "Cena" : "eleccion"
+  Sábado:
+    "Mediodía": "fijo"
+    "Cena": "eleccion"
+  Domingo:
+    "Mediodía": "fijo"
+
+menu_comida:
+  # Formato -> "Nombre": [multiplicador_solo, multiplicador_acompañado]
+  "Hamburguesas": [2, 1]
+  "Filetes de pollo": [4, 2]
+  "Filetes de lomo": [4, 3]
+  "Panceta": [2, 2]
+  "Chorizo de pollo": [0.5, 0.5]
+  "Morcilla": [0.5, 0.5]
+  "Pinchos de pollo": [0.1, 0.1]
+
+menu_bebida:
+  alcohol: ["NADA", "RED LABEL", "DYC 8", "BALLANTINES", "BEEFEATER", "BRUGAL", "RON BARCELÓ", "PUERTO DE INDIAS", "LARIOS"]
+  refrescos: ["NADA", "COCA COLA ZERO", "COCA COLA", "FANTA LIMON", "FANTA NARANJA", "7UP", "FUZZE TEA MARACUYÁ", "TÓNICA", "AGUA CON GAS"]
+  extras: ["Cerveza", "Tinto/Calimocho", "Rebujito", "Martini Blanco"]
+  chupitos_opciones: ["JAGGER", "TEQUIFRESA", "MELONCHELO", "CREMA DE ORUJO", "TEQUILA"]
+
+ratios_bebida:
+  alcohol_por_persona: 1.25
+  cerveza_diaria: 7
+  pack_cerveza: 24 #unidades por caja
+  tinto_por_persona: 1.25
+  refresco_por_dia: 1.75
+  cubos_rebujito_diarios: 2
+  botellas_manzanilla_por_cubo: 1 # Asumimos 1 botella por cubo, si es diferente lo cambiamos
+  martini_por_persona: 0.20
+  dyc_extra_por_manzanilla: 0.25
+
+precios_bebida:
+  "RED LABEL": 13.10
+  "DYC 8": 11.85
+  "BALLANTINES": 15.00
+  "BEEFEATER": 13.92
+  "BRUGAL": 13.75 # Asumiendo precio similar a Ron Barceló
+  "RON BARCELÓ": 13.75
+  "PUERTO DE INDIAS": 13.99
+  "LARIOS": 11.19
+  "CAJAS CERVEZA (24 uds)": 9.00
+  "TINTO": 1.40
+  "MANZANILLA": 5.90
+  "MARTINI BLANCO": 9.00
+  "COCA COLA ZERO": 1.50
+  "COCA COLA": 1.50
+  "FANTA LIMON": 1.39
+  "FANTA NARANJA": 1.39
+  "AGUA": 5.00 # Asumiendo garrafa 5L
+  "7UP": 1.15
+  "FUZZE TEA MARACUYÁ": 2.12
+  "TÓNICA": 2.00
+  "AGUA CON GAS": 2.00
+  "JAGGER": 12.04
+  "TEQUIFRESA": 8.00
+  "MELONCHELO": 8.00
+  "CREMA DE ORUJO": 8.00
+  "TEQUILA": 12.00
+
+precios_comida:
+  "Hamburguesas": 0.72        # €/unidad
+  "Morcilla": 2.35            # €/unidad
+  "Panceta": 0.55             # €/unidad
+  "Pinchos de pollo": 3.50    # €/tarrina 0.5 kg
+  "Filetes de pollo": 0.58    # €/unidad
+  "Chorizo de pollo": 0.68    # €/unidad
+  "Filetes de lomo": 0.40     # €/unidad
+  "Solomillos": 7.30          # €/unidad (aprox)
+  "Pollo paella (kg)": 6.70   # €/kg
+  "Magro paella (kg)": 6.75   # €/kg
+  "Barras de pan": 0.85
+  "Bandeja dulces pequeña": 4.50
+  "Medio pan": 1.20
+  "Gambas (kg)": 12.00
+  "Langostinos (kg)": 12.00
+  "Gambones (€/ud)": 0.5
+  "Menestra marisco (kg)": 9.00
+
+ratios_paella:
+  kg_por_persona_pollo: 0.0536  # = 1.5 kg / 28 personas (referencia 2025)
+  kg_por_persona_magro: 0.0536  # = 1.5 kg / 28 personas (referencia 2025)
+
+
+ratios_pescado:
+  # Kilos por persona. Ponemos 0 de momento hasta que sepas las cantidades.
+  kg_por_persona_gambas: 0.15
+  ud_por_persona_gambones: 1
+  kg_por_persona_langostinos: 0.15
+  kg_por_persona_menestra_marisco: 0.1
+
+cuotas:
+  normal: 130
+  sin_alcohol: 110
+
+gastos_fijos:
+  alquiler_furgon: 150.0
+  fianza_furgon: 220.0  # Ojo, esto se devuelve, pero hay que recaudarlo ahora
+  equipo_musica: 500.0
+  licencia_luz: 50.0
+  estimacion_hielo: 150.0

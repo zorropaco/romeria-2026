@@ -1,0 +1,8 @@
+__pycache__/
+.vscode/
+venv/
+.env
+.streamlit/secrets.toml
+datos_romeria.csv
+FACTURAS/*
+!FACTURAS/.gitkeep
