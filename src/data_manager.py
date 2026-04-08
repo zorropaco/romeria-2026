@@ -47,23 +47,29 @@ def _subir_dataframe(sheet, df):
 def leer_datos():
     try:
         sheet = get_google_sheet("Asistentes")
-        datos = sheet.get_all_values()  # get_all_values en lugar de get_all_records
-        
+        datos = sheet.get_all_values()
+
         if not datos or len(datos) < 2:
-            # Sin datos o solo cabeceras, devolvemos DataFrame vacío
             return pd.DataFrame()
-        
+
         cabeceras = datos[0]
         filas = datos[1:]
         df = pd.DataFrame(filas, columns=cabeceras)
         return df.fillna("")
-        
+
     except Exception as e:
         if "200" in str(e):
-            return pd.DataFrame()
+            # Intentamos de nuevo con get_all_records
+            try:
+                sheet = get_google_sheet("Asistentes")
+                datos = sheet.get_all_records()
+                if not datos:
+                    return pd.DataFrame()
+                return pd.DataFrame(datos).fillna("")
+            except:
+                return pd.DataFrame()
         print(f"[leer_datos] Error: {e}")
         return pd.DataFrame()
-
 
 # ---------------------------------------------------------------
 # APLANAR el payload del formulario a fila plana
