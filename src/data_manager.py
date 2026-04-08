@@ -46,29 +46,28 @@ def _subir_dataframe(sheet, df):
 # ---------------------------------------------------------------
 def leer_datos():
     try:
+        print("[leer_datos] Intentando conectar...")
         sheet = get_google_sheet("Asistentes")
+        print(f"[leer_datos] Sheet obtenido: {sheet.title}")
+        
         datos = sheet.get_all_values()
-
+        print(f"[leer_datos] Tipo de datos: {type(datos)}")
+        print(f"[leer_datos] Contenido: {datos}")
+        
         if not datos or len(datos) < 2:
+            print("[leer_datos] Sin datos suficientes")
             return pd.DataFrame()
 
         cabeceras = datos[0]
         filas = datos[1:]
         df = pd.DataFrame(filas, columns=cabeceras)
+        print(f"[leer_datos] DataFrame creado: {df.shape}")
         return df.fillna("")
 
     except Exception as e:
-        if "200" in str(e):
-            # Intentamos de nuevo con get_all_records
-            try:
-                sheet = get_google_sheet("Asistentes")
-                datos = sheet.get_all_records()
-                if not datos:
-                    return pd.DataFrame()
-                return pd.DataFrame(datos).fillna("")
-            except:
-                return pd.DataFrame()
-        print(f"[leer_datos] Error: {e}")
+        print(f"[leer_datos] EXCEPCION: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return pd.DataFrame()
 
 # ---------------------------------------------------------------

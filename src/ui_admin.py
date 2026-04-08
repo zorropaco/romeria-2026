@@ -6,27 +6,16 @@ from src.procesador import calcular_bebidas
 from src.procesador import calcular_coste_comida
 
 
-DATA_FILE = "datos_romeria.csv"
 
 
 def mostrar_admin(config):
     st.header("⚙️ Panel de Control - Romería")
-    
-    # 1. Comprobar si hay datos y si el archivo NO está vacío (> 0 bytes)
-    if not os.path.exists(DATA_FILE) or os.path.getsize(DATA_FILE) == 0:
-        st.warning("Aún no hay respuestas guardadas en la base de datos.")
-        return
         
-    try:
-        # 2. Leer los datos crudos
-        from src.data_manager import leer_datos, guardar_estado_pagos
+    from src.data_manager import leer_datos, guardar_estado_pagos
+    with st.spinner("Cargando datos desde Google Sheets..."):
         df_raw = leer_datos()
-        if df_raw.empty:
-            st.warning("Aún no hay respuestas en Google Sheets.")
-            return
-    except pd.errors.EmptyDataError:
-        # 3. Por si el archivo tiene un espacio en blanco y Pandas sigue fallando
-        st.warning("El archivo de datos está corrupto o vacío. Bórralo para empezar de cero.")
+    if df_raw.empty:
+        st.warning("⏳ Aún no hay respuestas en Google Sheets.")
         return
         
     # Rellenar los valores nulos (NaN)
@@ -264,25 +253,35 @@ def mostrar_admin(config):
         st.subheader("💰 Resumen de Tesorería")
         
         # 1. Recuperamos datos de comida y bebida de forma segura
-        total_bebida = gran_total_euros if 'gran_total_euros' in locals() else 0
-        
-        # Desglosamos la bebida usando las variables de la pestaña 2
-        total_alcohol = total_alcohol_euros if 'total_alcohol_euros' in locals() else 0
-        total_cerveza = total_cerveza_euros if 'total_cerveza_euros' in locals() else 0
-        total_vino = total_vino_euros if 'total_vino_euros' in locals() else 0
-        total_refrescos = total_refresco_euros if 'total_refresco_euros' in locals() else 0
+        # REEMPLAZAR POR ESTO (Tab 4 se calcula sola):
+        df_bebidas_tesoreria = calcular_bebidas(df_raw, config)
+
+        if not df_bebidas_tesoreria.empty:
+            resumen_beb = df_bebidas_tesoreria.groupby("Categoría")["Coste Total (€)"].sum()
+            total_alcohol = resumen_beb.get("ALCOHOL", 0)
+            total_cerveza = resumen_beb.get("CERVEZA", 0)
+            total_vino    = resumen_beb.get("VINO/MANZANILLA", 0)
+            total_refrescos = resumen_beb.get("REFRESCO", 0)
+            total_bebida  = resumen_beb.sum()
+        else:
+            total_alcohol = total_cerveza = total_vino = total_refrescos = total_bebida = 0
+
+        gasto_alcohol_puro   = total_alcohol + total_cerveza + total_vino
+        gasto_solo_refrescos = total_refrescos
         
         gasto_alcohol_puro = total_alcohol + total_cerveza + total_vino
         gasto_solo_refrescos = total_refrescos
         
-        if 'resumen_comida' in locals():
-            total_comida = resumen_comida.get("TOTAL COMIDA (€)", 0)
-            detalle_plancha = resumen_comida.get("Carne Plancha (€)", 0)
-            detalle_paella = resumen_comida.get("Carne Paella (€)", 0)
-            detalle_pan = resumen_comida.get("Panadería (€)", 0)
-            detalle_pescado = resumen_comida.get("Pescado/Marisco (€)", 0)
-        else:
-            total_comida = detalle_plancha = detalle_paella = detalle_pan = detalle_pescado = 0
+        # REEMPLAZAR POR ESTO:
+        df_compra_tab4  = calcular_lista_compra(df_raw, config)
+        resultado_tab4  = calcular_coste_comida(df_compra_tab4, df_raw, config)
+        resumen_comida_tab4 = resultado_tab4["resumen"]
+
+        total_comida    = resumen_comida_tab4.get("TOTAL COMIDA (€)", 0)
+        detalle_plancha = resumen_comida_tab4.get("Carne Plancha (€)", 0)
+        detalle_paella  = resumen_comida_tab4.get("Carne Paella (€)", 0)
+        detalle_pan     = resumen_comida_tab4.get("Panadería (€)", 0)
+        detalle_pescado = resumen_comida_tab4.get("Pescado/Marisco (€)", 0)
             
         # 1.2 Recuperamos gastos fijos desde el config.yaml
         fijos = config.get("gastos_fijos", {})
@@ -411,45 +410,31 @@ def mostrar_admin(config):
             
             enviado = st.form_submit_button("💾 Guardar Ticket", type="primary")
             
+            # REEMPLAZAR POR ESTO:
             if enviado:
                 if archivo is None:
                     st.error("❌ Tienes que subir un archivo.")
                 elif importe <= 0:
                     st.error("❌ El importe debe ser mayor que 0.")
                 else:
-                    # Calcular el índice (Carne1, Carne2...)
-                    if os.path.exists(REGISTRO_CSV):
-                        df_reg = pd.read_csv(REGISTRO_CSV)
-                        conteo = len(df_reg[df_reg["Categoria"] == categoria]) + 1
+                    from src.data_manager import guardar_ticket, leer_tickets
+                    
+                    # Calculamos índice para el nombre del archivo
+                    df_existentes = leer_tickets()
+                    if not df_existentes.empty and "Categoria" in df_existentes.columns:
+                        conteo = len(df_existentes[df_existentes["Categoria"] == categoria]) + 1
                     else:
                         conteo = 1
-                        
-                    # Extraer extensión original y crear el nuevo nombre
+                    
                     ext = archivo.name.split(".")[-1]
-                    # Limpiamos espacios o caracteres raros en la categoría para el nombre del archivo
-                    cat_limpia = categoria.split(" ")[0].replace("/", "") 
+                    cat_limpia = categoria.split(" ")[0].replace("/", "")
                     nombre_archivo = f"{cat_limpia}{conteo}_{importe}€.{ext}"
-                    ruta_guardado = os.path.join(FACTURAS_DIR, nombre_archivo)
                     
-                    # 1. Guardar el archivo físico en la carpeta
-                    with open(ruta_guardado, "wb") as f:
-                        f.write(archivo.getbuffer())
-                        
-                    # 2. Guardar el registro en el CSV de control
-                    nuevo_registro = pd.DataFrame([{
-                        "Archivo": nombre_archivo,
-                        "Categoria": categoria,
-                        "Importe (€)": float(importe)
-                    }])
-                    
-                    if os.path.exists(REGISTRO_CSV):
-                        df_reg = pd.concat([pd.read_csv(REGISTRO_CSV), nuevo_registro], ignore_index=True)
+                    # Guardamos en Google Sheets (persistente)
+                    if guardar_ticket(nombre_archivo, categoria, importe):
+                        st.success(f"✅ Ticket **{nombre_archivo}** guardado en Google Sheets.")
                     else:
-                        df_reg = nuevo_registro
-                        
-                    df_reg.to_csv(REGISTRO_CSV, index=False)
-                    
-                    st.success(f"✅ Ticket guardado correctamente como: **{nombre_archivo}**")
+                        st.error("❌ Error al guardar el ticket.")
 
     # ----- PESTAÑA 6: GASTOS REALES -----
     with tab6:
