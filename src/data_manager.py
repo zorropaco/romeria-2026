@@ -31,14 +31,26 @@ def get_google_sheet(nombre_pestana):
 # FUNCIÓN INTERNA: Sube un DataFrame a una hoja limpiamente
 # ---------------------------------------------------------------
 def _subir_dataframe(sheet, df):
+    if df is None or df.empty:
+        print("[_subir_dataframe] DataFrame vacío, abortando escritura para proteger datos")
+        return  # ← NUNCA borramos si no hay datos que escribir
+
     df = df.copy()
     df = df.fillna("")
     df = df.astype(str)
     df = df.replace("nan", "").replace("True", "TRUE").replace("False", "FALSE")
+    
     cabeceras = df.columns.tolist()
     filas = df.values.tolist()
-    sheet.clear()
-    sheet.update(range_name="A1", values=[cabeceras] + filas)
+    datos_completos = [cabeceras] + filas
+    
+    try:
+        sheet.clear()
+        sheet.update(range_name="A1", values=datos_completos)
+        print(f"[_subir_dataframe] OK — {len(filas)} filas escritas")
+    except Exception as e:
+        print(f"[_subir_dataframe] Error durante escritura: {e}")
+        raise  # Re-lanzamos para que el caller lo capture
 
 
 # ---------------------------------------------------------------

@@ -98,11 +98,19 @@ def mostrar_admin(config):
         )
         
         # 4. Guardar cambios si el usuario hizo algún check
-        if not edited_df["Pagado"].equals(df_gente["Pagado"]):
-            df_raw["Pagado"] = edited_df["Pagado"]
-            guardar_estado_pagos(df_raw)
-            st.success("¡Estado de pagos actualizado!")
-            st.rerun()
+        # REEMPLAZAR POR:
+        cambios_detectados = not edited_df["Pagado"].equals(df_gente["Pagado"])
+
+        if cambios_detectados:
+            if st.button("💾 Guardar cambios de pagos", type="primary"):
+                df_raw["Pagado"] = edited_df["Pagado"]
+                if guardar_estado_pagos(df_raw):
+                    st.success("✅ ¡Estado de pagos actualizado!")
+                    st.rerun()
+                else:
+                    st.error("❌ Error al guardar. Inténtalo de nuevo.")
+        else:
+            st.caption("✅ Sin cambios pendientes.")
             
         # Métrica visual
         total_personas = len(edited_df)
