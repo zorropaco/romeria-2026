@@ -40,7 +40,9 @@ def mostrar_admin(config):
         if "Pagado" not in df_raw.columns:
             df_raw["Pagado"] = False
         else:
-            df_raw["Pagado"] = df_raw["Pagado"].astype(bool)
+            df_raw["Pagado"] = df_raw["Pagado"].map(
+                lambda x: True if str(x).upper() in ["TRUE", "1", "SÍ", "SI"] else False
+            )
 
         # 2. Calcular cuotas personalizadas
         total_dias_evento = len(config.get("calendario", {}))
@@ -439,41 +441,61 @@ def mostrar_admin(config):
     # ----- PESTAÑA 6: GASTOS REALES -----
     with tab6:
         st.subheader("📈 Control de Gastos Reales")
-        
-        if os.path.exists(REGISTRO_CSV):
-            df_gastos = pd.read_csv(REGISTRO_CSV)
-            
-            if not df_gastos.empty:
-                gasto_total_real = df_gastos["Importe (€)"].sum()
-                
-                # Intentamos rescatar el gasto estimado de la tab4 para comparar
-                gasto_estimado = total_gastos if 'total_gastos' in locals() else 0
-                
-                col1, col2, col3 = st.columns(3)
-                col1.metric("Gasto Total ESTIMADO", f"{gasto_estimado:.2f} €")
-                col2.metric("Gasto Total REAL", f"{gasto_total_real:.2f} €")
-                
-                desviacion = gasto_estimado - gasto_total_real
-                if desviacion >= 0:
-                    col3.metric("Desviación (Sobrando)", f"+{desviacion:.2f} €", delta_color="normal")
-                else:
-                    col3.metric("Desviación (Pasados de presupuesto)", f"{desviacion:.2f} €", delta_color="inverse")
-                
-                st.divider()
-                
-                col_izq, col_der = st.columns(2)
-                
-                with col_izq:
-                    st.markdown("#### 📊 Agrupado por Categoría")
-                    resumen_real = df_gastos.groupby("Categoria")["Importe (€)"].sum().reset_index()
-                    # Ordenar de mayor a menor gasto
-                    resumen_real = resumen_real.sort_values(by="Importe (€)", ascending=False)
-                    st.dataframe(resumen_real.style.format({"Importe (€)": "{:.2f} €"}), hide_index=True, use_container_width=True)
-                
-                with col_der:
-                    st.markdown("#### 🧾 Historial de Tickets")
-                    st.dataframe(df_gastos.style.format({"Importe (€)": "{:.2f} €"}), hide_index=True, use_container_width=True)
-            else:
-                st.info("Aún no hay tickets registrados. Sube el primero en la pestaña anterior.")
+
+        from src.data_manager import leer_tickets
+        df_gastos = leer_tickets()
+
+        if df_gastos.empty:
+            st.info("Aún no hay tickets registrados. Sube el primero en la pestaña anterior.")
         else:
-            st.info("La carpeta de facturas está vacía. Sube tu primer ticket en la pestaña anterior.")        
+            df_gastos["Importe (€)"] = pd.to_numeric(df_gastos["Importe (€)"], errors="coerce").fillna(0)
+            gasto_total_real = df_gastos["Importe (€)"].sum()
+
+            # Gasto estimado: lo recalculamos aquí de forma autónoma (igual que Tab 4)
+            df_beb_tab6 = calcular_bebidas(df_raw, config)
+            if not df_beb_tab6.empty:
+                total_beb_tab6 = df_beb_tab6["Coste Total (€)"].sum()
+            else:
+                total_beb_tab6 = 0
+
+            df_compra_tab6   = calcular_lista_compra(df_raw, config)
+            resultado_tab6   = calcular_coste_comida(df_compra_tab6, df_raw, config)
+            total_comida_tab6 = resultado_tab6["resumen"].get("TOTAL COMIDA (€)", 0)
+
+            fijos_tab6 = config.get("gastos_fijos", {})
+            total_fijos_tab6 = sum(fijos_tab6.values())
+
+            gasto_estimado = total_beb_tab6 + total_comida_tab6 + total_fijos_tab6
+
+            # --- Métricas principales ---
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Gasto Total ESTIMADO", f"{gasto_estimado:.2f} €")
+            col2.metric("Gasto Total REAL", f"{gasto_total_real:.2f} €")
+
+            desviacion = gasto_estimado - gasto_total_real
+            if desviacion >= 0:
+                col3.metric("Desviación (Sobrando)", f"+{desviacion:.2f} €", delta_color="normal")
+            else:
+                col3.metric("Desviación (Pasados de presupuesto)", f"{desviacion:.2f} €", delta_color="inverse")
+
+            st.divider()
+
+            col_izq, col_der = st.columns(2)
+
+            with col_izq:
+                st.markdown("#### 📊 Agrupado por Categoría")
+                resumen_real = df_gastos.groupby("Categoria")["Importe (€)"].sum().reset_index()
+                resumen_real = resumen_real.sort_values(by="Importe (€)", ascending=False)
+                st.dataframe(
+                    resumen_real.style.format({"Importe (€)": "{:.2f} €"}),
+                    hide_index=True,
+                    use_container_width=True
+                )
+
+            with col_der:
+                st.markdown("#### 🧾 Historial de Tickets")
+                st.dataframe(
+                    df_gastos.style.format({"Importe (€)": "{:.2f} €"}),
+                    hide_index=True,
+                    use_container_width=True
+                )
