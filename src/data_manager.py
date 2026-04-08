@@ -44,6 +44,7 @@ def _subir_dataframe(sheet, df):
 # ---------------------------------------------------------------
 # LEER todos los asistentes
 # ---------------------------------------------------------------
+@st.cache_data(ttl=60)
 def leer_datos():
     try:
         print("[leer_datos] Intentando conectar...")
@@ -172,7 +173,7 @@ def guardar_estado_pagos(df_actualizado):
 def guardar_ticket(nombre_archivo, categoria, importe):
     try:
         sheet = get_google_sheet("Facturas")
-        datos_actuales = sheet.get_all_records()
+        datos_actuales = sheet.get_all_values()
 
         nuevo = pd.DataFrame([{
             "Archivo":     nombre_archivo,
@@ -180,18 +181,29 @@ def guardar_ticket(nombre_archivo, categoria, importe):
             "Importe (€)": float(importe)
         }])
 
-        if not datos_actuales:
+        if not datos_actuales or len(datos_actuales) < 2:
+            # Hoja vacía o solo cabeceras → creamos desde cero
             df_final = nuevo
+            print("[guardar_ticket] Hoja vacía, creando desde cero")
         else:
-            df_final = pd.concat([pd.DataFrame(datos_actuales), nuevo], ignore_index=True)
+            cabeceras = datos_actuales[0]
+            filas = datos_actuales[1:]
+            df_existente = pd.DataFrame(filas, columns=cabeceras)
+            df_existente["Importe (€)"] = pd.to_numeric(df_existente["Importe (€)"], errors="coerce").fillna(0)
+            df_final = pd.concat([df_existente, nuevo], ignore_index=True)
+            print(f"[guardar_ticket] Añadiendo ticket a {len(df_existente)} existentes")
 
         _subir_dataframe(sheet, df_final)
+        print(f"[guardar_ticket] Ticket '{nombre_archivo}' guardado OK")
         return True
 
     except Exception as e:
         if "200" in str(e):
+            print("[guardar_ticket] Response 200 capturado como excepción, pero es OK")
             return True
-        print(f"[guardar_ticket] Error: {e}")
+        print(f"[guardar_ticket] Error REAL: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 

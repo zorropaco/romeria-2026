@@ -19,7 +19,7 @@ with st.sidebar:
     st.write("🔒 Acceso Admin")
     admin_pwd = st.text_input("Contraseña", type="password")
 
-if admin_pwd == "admin":
+if admin_pwd == st.secrets["general"]["admin_password"]:
     st.success("✅ Modo Admin Activado")
     mostrar_admin(config)
 else:

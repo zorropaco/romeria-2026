@@ -72,6 +72,7 @@ def calcular_bebidas(df_raw, config):
     lista_compra_bebidas = {}
     
     # Aseguramos que las columnas de números sean numéricas (por si vienen como texto)
+    df_raw = df_raw.copy()
     df_raw["Num_Dias"] = pd.to_numeric(df_raw["Num_Dias"], errors="coerce").fillna(0)
     
     total_dias_evento = len(config["calendario"].keys()) # Ej: 3 días (Viernes, Sábado, Domingo)
