@@ -37,6 +37,7 @@ ratios_bebida:
   botellas_manzanilla_por_cubo: 1 # Asumimos 1 botella por cubo, si es diferente lo cambiamos
   martini_por_persona: 0.20
   dyc_extra_por_manzanilla: 0.25
+  chupito_por_persona: 0.15
 
 precios_bebida:
   "RED LABEL": 13.10
@@ -80,10 +81,10 @@ precios_comida:
   "Barras de pan": 0.85
   "Bandeja dulces pequeña": 4.50
   "Medio pan": 1.20
-  "Gambas (kg)": 12.00
-  "Langostinos (kg)": 12.00
-  "Gambones (€/ud)": 0.5
-  "Menestra marisco (kg)": 9.00
+  "Gambas (kg)": 23.00
+  "Langostinos (kg)": 13.80
+  "Gambones (€/ud)": 0.69   #El kg es 13.8€ y asumimos que 1 ud pesa 50g => 13.8€/kg / 20 ud/kg = 0.69€/ud
+  "Menestra marisco (kg)": 8.00
 
 ratios_paella:
   kg_por_persona_pollo: 0.0536  # = 1.5 kg / 28 personas (referencia 2025)

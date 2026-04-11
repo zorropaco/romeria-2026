@@ -173,7 +173,7 @@ def calcular_bebidas(df_raw, config):
                 votos = (df_chupitos["Extra_Chupito"] == chupito_ganador).sum()
             
                 # Calculamos y lo añadimos a la lista de la compra SOLO si hubo un ganador válido
-                botellas_chupito = len(df_chupitos) * 0.25
+                botellas_chupito = len(df_chupitos) * ratios["chupito_por_persona"]
                 lista_compra_bebidas[f"CHUPITO GANADOR: {chupito_ganador} ({votos} votos)"] = botellas_chupito
 
 
