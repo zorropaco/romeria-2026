@@ -27,6 +27,8 @@ menu_bebida:
   extras: ["Cerveza", "Tinto/Calimocho", "Rebujito", "Martini Blanco"]
   chupitos_opciones: ["JAGGER", "TEQUIFRESA", "MELONCHELO", "CREMA DE ORUJO", "TEQUILA"]
 
+menu_embutido:
+
 ratios_bebida:
   alcohol_por_persona: 1.25
   cerveza_diaria: 7
@@ -41,31 +43,31 @@ ratios_bebida:
 
 precios_bebida:
   "RED LABEL": 13.10
-  "DYC 8": 11.85
-  "BALLANTINES": 15.00
-  "BEEFEATER": 13.92
-  "BRUGAL": 13.75 # Asumiendo precio similar a Ron Barceló
-  "RON BARCELÓ": 13.75
-  "PUERTO DE INDIAS": 13.99
-  "LARIOS": 11.19
-  "CAJAS CERVEZA (24 uds)": 9.00
-  "TINTO": 1.40
-  "MANZANILLA": 5.90
-  "MARTINI BLANCO": 9.00
-  "COCA COLA ZERO": 1.50
-  "COCA COLA": 1.50
-  "FANTA LIMON": 1.39
-  "FANTA NARANJA": 1.39
-  "AGUA": 5.00 # Asumiendo garrafa 5L
-  "7UP": 1.15
-  "FUZZE TEA MARACUYÁ": 2.12
-  "TÓNICA": 2.00
+  "DYC 8": 12.22
+  "BALLANTINES": 13.18
+  "BEEFEATER": 13.91
+  "BRUGAL": 13.55 # Asumiendo precio similar a Ron Barceló
+  "RON BARCELÓ": 15.24
+  "PUERTO DE INDIAS": 15.00
+  "LARIOS": 11.60
+  "CAJAS CERVEZA (24 uds)": 9.50
+  "TINTO": 2.5
+  "MANZANILLA": 6.66
+  "MARTINI BLANCO": 9.44
+  "COCA COLA ZERO": 1.65
+  "COCA COLA": 1.65
+  "FANTA LIMON": 1.40
+  "FANTA NARANJA": 1.40
+  "AGUA": 0.8 # Asumiendo garrafa 5L
+  "7UP": 1.40
+  "FUZZE TEA MARACUYÁ": 1.5
+  "TÓNICA": 1.1
   "AGUA CON GAS": 2.00
-  "JAGGER": 12.04
-  "TEQUIFRESA": 8.00
-  "MELONCHELO": 8.00
-  "CREMA DE ORUJO": 8.00
-  "TEQUILA": 12.00
+  "JAGGER": 13.25
+  "TEQUIFRESA": 12.90
+  "MELONCHELO": 7.87
+  "CREMA DE ORUJO": 12.22
+  "TEQUILA": 15.25
 
 precios_comida:
   "Hamburguesas": 0.72        # €/unidad
@@ -103,7 +105,7 @@ cuotas:
   sin_alcohol: 110
 
 gastos_fijos:
-  alquiler_furgon: 150.0
+  alquiler_furgon: 180.0
   fianza_furgon: 220.0  # Ojo, esto se devuelve, pero hay que recaudarlo ahora
   equipo_musica: 500.0
   licencia_luz: 50.0
