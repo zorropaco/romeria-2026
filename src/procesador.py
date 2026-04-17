@@ -358,7 +358,7 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
     
     ratios_solomillos = config.get("ratios_solomillos", {})
     personas_por_solomillo = ratios_solomillos.get("personas_por_solomillo", 2)
-    solomillos = math.ceil(personas_domingo / personas_por_solomillo)
+    solomillos = round(personas_domingo / personas_por_solomillo)
     precio_solomillo = precios.get("Solomillos", 7.30)
     coste_solomillos = solomillos * precio_solomillo
     
