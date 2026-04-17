@@ -36,7 +36,7 @@ ratios_embutido:
 
 ratios_bebida:
   alcohol_por_persona: 1.25
-  cerveza_diaria: 7
+  cerveza_diaria: 8
   pack_cerveza: 24 #unidades por caja
   tinto_por_persona: 1.25
   refresco_por_dia: 1.75
@@ -108,6 +108,9 @@ ratios_pescado:
 
 ratios_panaderia:
   empanadas_fijas: 3  # Total fijo independientemente de personas/días
+
+ratios_solomillos:
+  personas_por_solomillo: 2  # 1 solomillo por cada 2 personas
 
 cuotas:
   normal: 130

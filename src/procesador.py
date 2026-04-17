@@ -349,6 +349,30 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
     ])
 
     # ------------------
+    # SOLOMILLOS (Domingo)
+    # ------------------
+    # Los solomillos se calculan según el número de personas que comen el domingo
+    personas_domingo = 0
+    if "Comida_Domingo_Mediodía" in df_raw.columns:
+        personas_domingo = (df_raw["Comida_Domingo_Mediodía"] == "Menú Fijo").sum()
+    
+    ratios_solomillos = config.get("ratios_solomillos", {})
+    personas_por_solomillo = ratios_solomillos.get("personas_por_solomillo", 2)
+    solomillos = math.ceil(personas_domingo / personas_por_solomillo)
+    precio_solomillo = precios.get("Solomillos", 7.30)
+    coste_solomillos = solomillos * precio_solomillo
+    
+    df_solomillos = pd.DataFrame([
+        {
+            "Producto": "Solomillos",
+            "Personas Domingo": personas_domingo,
+            "Unidades": solomillos,
+            "Precio unit. (€)": precio_solomillo,
+            "Coste total (€)": coste_solomillos
+        }
+    ])
+    
+    # ------------------
     # PESCADO / MARISCO
     # ------------------
     ratios_pescado = config.get("ratios_pescado", {})
@@ -358,7 +382,7 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
     kg_langostinos = redondear_medio_kilo_superior(num_comensales * ratios_pescado.get("kg_por_persona_langostinos", 0))
     kg_menestra_marisco = redondear_medio_kilo_superior(num_comensales * ratios_pescado.get("kg_por_persona_menestra_marisco", 0))
     
-
+ 
     df_pescado = pd.DataFrame([
         {
             "Producto": "Gambas",
@@ -393,6 +417,7 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
     coste_paella = df_paella["Coste total (€)"].sum()
     coste_panaderia = df_panaderia["Coste total (€)"].sum()
     coste_embutido = df_embutido["Coste total (€)"].sum()
+    coste_solomillos = df_solomillos["Coste total (€)"].sum()
     coste_pescado = df_pescado["Coste total (€)"].sum()
 
     resumen = {
@@ -400,8 +425,9 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
         "Carne Paella (€)": coste_paella,
         "Panadería (€)": coste_panaderia,
         "Embutido (€)": coste_embutido,
+        "Solomillos (€)": coste_solomillos,
         "Pescado/Marisco (€)": coste_pescado,
-        "TOTAL COMIDA (€)": coste_plancha + coste_paella + coste_panaderia + coste_embutido + coste_pescado
+        "TOTAL COMIDA (€)": coste_plancha + coste_paella + coste_panaderia + coste_embutido + coste_solomillos + coste_pescado
     }
 
     return {
@@ -409,6 +435,7 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
         "df_paella": df_paella,
         "df_panaderia": df_panaderia,
         "df_embutido": df_embutido,
+        "df_solomillos": df_solomillos,
         "df_pescado": df_pescado,
         "resumen": resumen
         

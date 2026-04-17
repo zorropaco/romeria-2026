@@ -207,6 +207,7 @@ def mostrar_admin(config):
         df_paella = resultado_comida["df_paella"]
         df_panaderia = resultado_comida.get("df_panaderia", pd.DataFrame())
         df_embutido = resultado_comida.get("df_embutido", pd.DataFrame())
+        df_solomillos = resultado_comida.get("df_solomillos", pd.DataFrame())
         df_pescado = resultado_comida.get("df_pescado", pd.DataFrame())
 
         if not df_panaderia.empty:
@@ -217,6 +218,10 @@ def mostrar_admin(config):
             st.markdown("##### 🥓 Embutido")
             st.dataframe(df_embutido, width="stretch", hide_index=True)
 
+        if not df_solomillos.empty:
+            st.markdown("##### 🥩 Solomillos (Domingo)")
+            st.dataframe(df_solomillos, width="stretch", hide_index=True)
+
         if not df_pescado.empty:
             st.markdown("##### 🦐 Pescado y Marisco")
             st.dataframe(df_pescado, width="stretch", hide_index=True)
@@ -225,11 +230,12 @@ def mostrar_admin(config):
         resumen_comida = resultado_comida["resumen"]
 
         # Métricas de coste
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
         col1.metric("Plancha (€)", f'{resumen_comida["Carne Plancha (€)"]:.2f} €')
         col2.metric("Paella (€)", f'{resumen_comida["Carne Paella (€)"]:.2f} €')
         col3.metric("Embutido (€)", f'{resumen_comida["Embutido (€)"]:.2f} €')
-        col4.metric("Total Comida (€)", f'{resumen_comida["TOTAL COMIDA (€)"]:.2f} €')
+        col4.metric("Solomillos (€)", f'{resumen_comida["Solomillos (€)"]:.2f} €')
+        col5.metric("Total Comida (€)", f'{resumen_comida["TOTAL COMIDA (€)"]:.2f} €')
 
         st.markdown("##### Detalle carne de plancha")
         df_plancha_show = df_plancha.copy()
