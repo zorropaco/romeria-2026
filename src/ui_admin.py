@@ -206,11 +206,16 @@ def mostrar_admin(config):
         df_plancha = resultado_comida["df_plancha"]
         df_paella = resultado_comida["df_paella"]
         df_panaderia = resultado_comida.get("df_panaderia", pd.DataFrame())
+        df_embutido = resultado_comida.get("df_embutido", pd.DataFrame())
         df_pescado = resultado_comida.get("df_pescado", pd.DataFrame())
 
         if not df_panaderia.empty:
             st.markdown("##### 🥖 Pan y Dulces")
             st.dataframe(df_panaderia, width="stretch", hide_index=True)
+
+        if not df_embutido.empty:
+            st.markdown("##### 🥓 Embutido")
+            st.dataframe(df_embutido, width="stretch", hide_index=True)
 
         if not df_pescado.empty:
             st.markdown("##### 🦐 Pescado y Marisco")
@@ -220,10 +225,11 @@ def mostrar_admin(config):
         resumen_comida = resultado_comida["resumen"]
 
         # Métricas de coste
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         col1.metric("Plancha (€)", f'{resumen_comida["Carne Plancha (€)"]:.2f} €')
         col2.metric("Paella (€)", f'{resumen_comida["Carne Paella (€)"]:.2f} €')
-        col3.metric("Total Comida (€)", f'{resumen_comida["TOTAL COMIDA (€)"]:.2f} €')
+        col3.metric("Embutido (€)", f'{resumen_comida["Embutido (€)"]:.2f} €')
+        col4.metric("Total Comida (€)", f'{resumen_comida["TOTAL COMIDA (€)"]:.2f} €')
 
         st.markdown("##### Detalle carne de plancha")
         df_plancha_show = df_plancha.copy()
@@ -291,8 +297,9 @@ def mostrar_admin(config):
         detalle_plancha = resumen_comida_tab4.get("Carne Plancha (€)", 0)
         detalle_paella  = resumen_comida_tab4.get("Carne Paella (€)", 0)
         detalle_pan     = resumen_comida_tab4.get("Panadería (€)", 0)
+        detalle_embutido = resumen_comida_tab4.get("Embutido (€)", 0)
         detalle_pescado = resumen_comida_tab4.get("Pescado/Marisco (€)", 0)
-            
+        
         # 1.2 Recuperamos gastos fijos desde el config.yaml
         fijos = config.get("gastos_fijos", {})
         coste_furgon = fijos.get("alquiler_furgon", 0.0)
@@ -310,21 +317,22 @@ def mostrar_admin(config):
         st.markdown("### 🗂️ Desglose del Presupuesto")
         
         st.markdown("##### Comida")
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         col1.metric("🥩 Carne (Plancha + Paella)", f"{(detalle_plancha + detalle_paella):.2f} €")
         col2.metric("🥖 Panadería y Dulces", f"{detalle_pan:.2f} €")
-        col3.metric("🦐 Pescado y Marisco", f"{detalle_pescado:.2f} €")
+        col3.metric("🥓 Embutido", f"{detalle_embutido:.2f} €")
+        col4.metric("🦐 Pescado y Marisco", f"{detalle_pescado:.2f} €")
         
         st.markdown("##### Bebida y Gastos Fijos")
-        col4, col5, col6, col7 = st.columns(4)
-        col4.metric("🍹 Bebidas Total", f"{total_bebida:.2f} €")
-        col5.metric("🧊 Hielo", f"{coste_hielo:.2f} €")
-        col6.metric("💡 Punto de Luz", f"{coste_luz:.2f} €")
-        col7.metric("🎵 Equipo de Música", f"{coste_musica:.2f} €")
+        col5, col6, col7, col8 = st.columns(4)
+        col5.metric("🍹 Bebidas Total", f"{total_bebida:.2f} €")
+        col6.metric("🧊 Hielo", f"{coste_hielo:.2f} €")
+        col7.metric("💡 Punto de Luz", f"{coste_luz:.2f} €")
+        col8.metric("🎵 Equipo de Música", f"{coste_musica:.2f} €")
         
-        col8, col9, col10 = st.columns(3)
-        col8.metric("🚐 Furgo + Fianza", f"{(coste_furgon + fianza_furgon):.2f} €")
-        col9.metric("🔴 GASTO TOTAL", f"{total_gastos:.2f} €")
+        col9, col10, col11 = st.columns(3)
+        col9.metric("🚐 Furgo + Fianza", f"{(coste_furgon + fianza_furgon):.2f} €")
+        col10.metric("🔴 GASTO TOTAL", f"{total_gastos:.2f} €")
         
         st.divider()
 

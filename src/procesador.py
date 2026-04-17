@@ -312,17 +312,40 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
     
     # DIAS * GENTE / BARRA (a 2.5 pers/barra)
     barras_pan_exacto = (dias_romeria * num_comensales) / 2.5
-    barras_pan = math.ceil(barras_pan_exacto) 
+    barras_pan = math.ceil(barras_pan_exacto)
     
     bandejas_dulces = round(num_comensales / 2)
     
     medio_pan_exacto = num_comensales / 3
     medio_pan = math.ceil(medio_pan_exacto)
+    
+    # Empanadas: cantidad fija independientemente de personas/días
+    ratios_panaderia = config.get("ratios_panaderia", {})
+    empanadas = ratios_panaderia.get("empanadas_fijas", 3)
 
     df_panaderia = pd.DataFrame([
         {"Producto": "Barras de pan", "Unidades": barras_pan, "Precio unit. (€)": precios.get("Barras de pan", 0), "Coste total (€)": barras_pan * precios.get("Barras de pan", 0)},
         {"Producto": "Bandeja dulces pequeña", "Unidades": bandejas_dulces, "Precio unit. (€)": precios.get("Bandeja dulces pequeña", 0), "Coste total (€)": bandejas_dulces * precios.get("Bandeja dulces pequeña", 0)},
         {"Producto": "Medio pan", "Unidades": medio_pan, "Precio unit. (€)": precios.get("Medio pan", 0), "Coste total (€)": medio_pan * precios.get("Medio pan", 0)},
+        {"Producto": "Empanadas", "Unidades": empanadas, "Precio unit. (€)": precios.get("Empanadas", 0), "Coste total (€)": empanadas * precios.get("Empanadas", 0)},
+    ])
+    
+    # ------------------
+    # EMBUTIDO
+    # ------------------
+    ratios_embutido = config.get("ratios_embutido", {})
+    personas_por_plato = ratios_embutido.get("personas_por_plato", 6)
+    
+    # Calculamos el número de platos necesarios (redondeando hacia arriba)
+    platos_embutido = math.ceil(num_comensales / personas_por_plato)
+    
+    precios_embutido = config.get("menu_embutido", {})
+    precio_jamon = precios_embutido.get("Jamón", 8.00)
+    precio_embutido_variado = precios_embutido.get("Embutido variado", 8.00)
+    
+    df_embutido = pd.DataFrame([
+        {"Producto": "Jamón", "Platos": platos_embutido, "Precio unit. (€)": precio_jamon, "Coste total (€)": platos_embutido * precio_jamon},
+        {"Producto": "Embutido variado", "Platos": platos_embutido, "Precio unit. (€)": precio_embutido_variado, "Coste total (€)": platos_embutido * precio_embutido_variado},
     ])
 
     # ------------------
@@ -369,21 +392,24 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
     coste_plancha = df_plancha["Coste total (€)"].sum()
     coste_paella = df_paella["Coste total (€)"].sum()
     coste_panaderia = df_panaderia["Coste total (€)"].sum()
+    coste_embutido = df_embutido["Coste total (€)"].sum()
     coste_pescado = df_pescado["Coste total (€)"].sum()
 
     resumen = {
         "Carne Plancha (€)": coste_plancha,
         "Carne Paella (€)": coste_paella,
         "Panadería (€)": coste_panaderia,
+        "Embutido (€)": coste_embutido,
         "Pescado/Marisco (€)": coste_pescado,
-        "TOTAL COMIDA (€)": coste_plancha + coste_paella + coste_panaderia + coste_pescado
+        "TOTAL COMIDA (€)": coste_plancha + coste_paella + coste_panaderia + coste_embutido + coste_pescado
     }
 
     return {
         "df_plancha": df_plancha,
         "df_paella": df_paella,
         "df_panaderia": df_panaderia,
+        "df_embutido": df_embutido,
         "df_pescado": df_pescado,
         "resumen": resumen
         
-    }     
+    }
