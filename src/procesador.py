@@ -314,9 +314,9 @@ def calcular_coste_comida(df_compra_carnes: pd.DataFrame, df_raw: pd.DataFrame, 
     barras_pan_exacto = (dias_romeria * num_comensales) / 2.5
     barras_pan = math.ceil(barras_pan_exacto)
     
-    bandejas_dulces = round(num_comensales / 2)
+    bandejas_dulces = round(num_comensales / 4)
     
-    medio_pan_exacto = num_comensales / 3
+    medio_pan_exacto = num_comensales / 6
     medio_pan = math.ceil(medio_pan_exacto)
     
     # Empanadas: cantidad fija independientemente de personas/días
