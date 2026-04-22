@@ -39,7 +39,7 @@ ratios_bebida:
   cerveza_diaria: 8
   pack_cerveza: 24 #unidades por caja
   tinto_por_persona: 1.25
-  refresco_por_dia: 1.75
+  refresco_por_dia: 1.5
   cubos_rebujito_diarios: 2
   botellas_manzanilla_por_cubo: 1 # Asumimos 1 botella por cubo, si es diferente lo cambiamos
   martini_por_persona: 0.20
